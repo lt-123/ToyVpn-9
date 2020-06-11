@@ -18,7 +18,6 @@ package com.example.android.toyvpn;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.VpnService;
@@ -121,13 +120,11 @@ public class ToyVpnService extends VpnService implements Handler.Callback {
 
         // Handler to mark as connected once onEstablish is called.
         connection.setConfigureIntent(mConfigureIntent);
-        connection.setOnEstablishListener(new ToyVpnConnection.OnEstablishListener() {
-            public void onEstablish(ParcelFileDescriptor tunInterface) {
-                mHandler.sendEmptyMessage(R.string.connected);
+        connection.setOnEstablishListener(tunInterface -> {
+            mHandler.sendEmptyMessage(R.string.connected);
 
-                mConnectingThread.compareAndSet(thread, null);
-                setConnection(new Connection(thread, tunInterface));
-            }
+            mConnectingThread.compareAndSet(thread, null);
+            setConnection(new Connection(thread, tunInterface));
         });
         thread.start();
     }
@@ -159,6 +156,7 @@ public class ToyVpnService extends VpnService implements Handler.Callback {
     }
 
     private void updateForegroundNotification(final int message) {
+        //noinspection deprecation
         startForeground(1, new Notification.Builder(this)
                 .setSmallIcon(R.drawable.ic_vpn)
                 .setContentText(getString(message))

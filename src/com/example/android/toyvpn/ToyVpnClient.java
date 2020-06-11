@@ -36,9 +36,9 @@ public class ToyVpnClient extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form);
 
-        final TextView serverAddress = (TextView) findViewById(R.id.address);
-        final TextView serverPort = (TextView) findViewById(R.id.port);
-        final TextView sharedSecret = (TextView) findViewById(R.id.secret);
+        final TextView serverAddress = findViewById(R.id.address);
+        final TextView serverPort = findViewById(R.id.port);
+        final TextView sharedSecret = findViewById(R.id.secret);
 
         final SharedPreferences prefs = getSharedPreferences(Prefs.NAME, MODE_PRIVATE);
         serverAddress.setText(prefs.getString(Prefs.SERVER_ADDRESS, ""));
@@ -50,7 +50,7 @@ public class ToyVpnClient extends Activity {
                     .putString(Prefs.SERVER_ADDRESS, serverAddress.getText().toString())
                     .putString(Prefs.SERVER_PORT, serverPort.getText().toString())
                     .putString(Prefs.SHARED_SECRET, sharedSecret.getText().toString())
-                    .commit();
+                    .apply();
 
             Intent intent = VpnService.prepare(ToyVpnClient.this);
             if (intent != null) {
@@ -59,9 +59,8 @@ public class ToyVpnClient extends Activity {
                 onActivityResult(0, RESULT_OK, null);
             }
         });
-        findViewById(R.id.disconnect).setOnClickListener(v -> {
-            startService(getServiceIntent().setAction(ToyVpnService.ACTION_DISCONNECT));
-        });
+        findViewById(R.id.disconnect).setOnClickListener(v ->
+                startService(getServiceIntent().setAction(ToyVpnService.ACTION_DISCONNECT)));
     }
 
     @Override

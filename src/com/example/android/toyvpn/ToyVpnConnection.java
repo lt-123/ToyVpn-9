@@ -16,8 +16,6 @@
 
 package com.example.android.toyvpn;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
 import android.app.PendingIntent;
 import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
@@ -33,6 +31,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.TimeUnit;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
+
 public class ToyVpnConnection implements Runnable {
     /**
      * Callback interface to let the {@link ToyVpnService} know about new connections
@@ -42,25 +42,32 @@ public class ToyVpnConnection implements Runnable {
         void onEstablish(ParcelFileDescriptor tunInterface);
     }
 
-    /** Maximum packet size is constrained by the MTU, which is given as a signed short. */
+    /**
+     * Maximum packet size is constrained by the MTU, which is given as a signed short.
+     */
     private static final int MAX_PACKET_SIZE = Short.MAX_VALUE;
 
-    /** Time to wait in between losing the connection and retrying. */
+    /**
+     * Time to wait in between losing the connection and retrying.
+     */
     private static final long RECONNECT_WAIT_MS = TimeUnit.SECONDS.toMillis(3);
 
-    /** Time between keepalives if there is no traffic at the moment.
-     *
+    /**
+     * Time between keepalives if there is no traffic at the moment.
+     * <p>
      * TODO: don't do this; it's much better to let the connection die and then reconnect when
-     *       necessary instead of keeping the network hardware up for hours on end in between.
+     * necessary instead of keeping the network hardware up for hours on end in between.
      **/
     private static final long KEEPALIVE_INTERVAL_MS = TimeUnit.SECONDS.toMillis(15);
 
-    /** Time to wait without receiving any response before assuming the server is gone. */
+    /**
+     * Time to wait without receiving any response before assuming the server is gone.
+     */
     private static final long RECEIVE_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(20);
 
     /**
      * Time between polling the VPN interface for new traffic, since it's non-blocking.
-     *
+     * <p>
      * TODO: really don't do this; a blocking read on another thread is much cleaner.
      */
     private static final long IDLE_INTERVAL_MS = TimeUnit.MILLISECONDS.toMillis(100);
@@ -68,7 +75,7 @@ public class ToyVpnConnection implements Runnable {
     /**
      * Number of periods of length {@IDLE_INTERVAL_MS} to wait before declaring the handshake a
      * complete and abject failure.
-     *
+     * <p>
      * TODO: use a higher-level protocol; hand-rolling is a fun but pointless exercise.
      */
     private static final int MAX_HANDSHAKE_ATTEMPTS = 50;
@@ -84,12 +91,12 @@ public class ToyVpnConnection implements Runnable {
     private OnEstablishListener mOnEstablishListener;
 
     public ToyVpnConnection(final VpnService service, final int connectionId,
-            final String serverName, final int serverPort, final byte[] sharedSecret) {
+                            final String serverName, final int serverPort, final byte[] sharedSecret) {
         mService = service;
         mConnectionId = connectionId;
 
         mServerName = serverName;
-        mServerPort= serverPort;
+        mServerPort = serverPort;
         mSharedSecret = sharedSecret;
     }
 
